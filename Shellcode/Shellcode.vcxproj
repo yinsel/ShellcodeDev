@@ -153,6 +153,10 @@
   <ItemGroup>
     <ClCompile Include="Shellcode.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\api.h" />
+    <ClInclude Include="..\include\utils.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -24,7 +24,7 @@ typedef HRESULT(WINAPI* SHGetFolderPathWFunc)(
     HANDLE hToken,
     DWORD dwFlags,
     LPWSTR pszPath
-);
+    );
 typedef HANDLE
 (*WINAPI
     CreateFileWFunc)(
@@ -43,9 +43,9 @@ typedef VOID
         );
 typedef VOID
 (*WINAPI
-	SleepFunc)(
-		_In_ DWORD dwMilliseconds
-		);
+    SleepFunc)(
+        _In_ DWORD dwMilliseconds
+        );
 typedef HINTERNET(*InternetOpenAFunc)(
     LPCSTR lpszAgent,
     DWORD  dwAccessType,
@@ -63,34 +63,63 @@ typedef HINTERNET(*InternetOpenUrlAFunc)(
     );
 typedef BOOL
 (*HttpQueryInfoAFunc)(
-	_In_ HINTERNET hRequest,
-	_In_ DWORD dwInfoLevel,
-	_Inout_updates_bytes_to_opt_(*lpdwBufferLength, *lpdwBufferLength) __out_data_source(NETWORK) LPVOID lpBuffer,
-	_Inout_ LPDWORD lpdwBufferLength,
-	_Inout_opt_ LPDWORD lpdwIndex
-	);
+    _In_ HINTERNET hRequest,
+    _In_ DWORD dwInfoLevel,
+    _Inout_updates_bytes_to_opt_(*lpdwBufferLength, *lpdwBufferLength) __out_data_source(NETWORK) LPVOID lpBuffer,
+    _Inout_ LPDWORD lpdwBufferLength,
+    _Inout_opt_ LPDWORD lpdwIndex
+    );
 typedef LPVOID
 (*WINAPI
-	VirtualAllocFunc)(
-		_In_opt_ LPVOID lpAddress,
-		_In_     SIZE_T dwSize,
-		_In_     DWORD flAllocationType,
-		_In_     DWORD flProtect
-		);
+    VirtualAllocFunc)(
+        _In_opt_ LPVOID lpAddress,
+        _In_     SIZE_T dwSize,
+        _In_     DWORD flAllocationType,
+        _In_     DWORD flProtect
+        );
 typedef BOOL(*InternetReadFileFunc)(
     HANDLE hFile,
-	LPVOID    lpBuffer,
-	DWORD     dwNumberOfBytesToRead,
-	LPDWORD   lpdwNumberOfBytesRead
-	);
+    LPVOID    lpBuffer,
+    DWORD     dwNumberOfBytesToRead,
+    LPDWORD   lpdwNumberOfBytesRead
+    );
 typedef BOOL(*InternetCloseHandleFunc)(
-	_In_ HANDLE hInternet
-	);
+    _In_ HANDLE hInternet
+    );
 typedef BOOL
 (*WINAPI
-	VirtualProtectFunc)(
-		_In_  LPVOID lpAddress,
-		_In_  SIZE_T dwSize,
-		_In_  DWORD flNewProtect,
-		_Out_ PDWORD lpflOldProtect
-		);
+    VirtualProtectFunc)(
+        _In_  LPVOID lpAddress,
+        _In_  SIZE_T dwSize,
+        _In_  DWORD flNewProtect,
+        _Out_ PDWORD lpflOldProtect
+        );
+typedef void (*RtlMoveMemoryFunc)(
+    void* Destination,
+    const void* Source,
+    size_t      Length
+    );
+typedef HRSRC
+(*WINAPI
+    FindResourceAFunc)(
+        _In_opt_ HMODULE hModule,
+        _In_     LPCSTR lpName,
+        _In_     LPCSTR lpType
+        );
+typedef HGLOBAL
+(*WINAPI
+    LoadResourceFunc)(
+        _In_opt_ HMODULE hModule,
+        _In_ HRSRC hResInfo
+        );
+typedef DWORD
+(*WINAPI
+    SizeofResourceFunc)(
+        _In_opt_ HMODULE hModule,
+        _In_ HRSRC hResInfo
+        );
+typedef LPVOID
+(*WINAPI
+    LockResourceFunc)(
+        _In_ HGLOBAL hResData
+        );
