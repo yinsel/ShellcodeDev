@@ -56,11 +56,12 @@ __forceinline _DWORD GetExeBaseAddr() {
 }
 
 __forceinline _DWORD GetNtdllAddr() {
-	_DWORD dwExe = 0;
+	_DWORD dwNtll = 0;
 	_PDWORD InLoadOrderModuleList = GetInLoadOrderModuleList();
 	_PDWORD pModuleExe = (_PDWORD)*InLoadOrderModuleList;
-	dwExe = pModuleExe[6];
-	return dwExe;
+	_PDWORD pModuleNtdll = (_PDWORD)*pModuleExe;
+	dwNtll = pModuleNtdll[6];
+	return dwNtll;
 }
 
 
