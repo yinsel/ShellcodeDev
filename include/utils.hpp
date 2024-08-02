@@ -1,7 +1,3 @@
-#include<windows.h>
-#include<shlobj.h>
-#include<api.h>
-#include<hash.h>
 #if defined(_WIN64)
 #define _PEB_Offset 0x60
 #define _Ldr_Offset 0x18
@@ -18,41 +14,50 @@ typedef PDWORD _PDWORD;
 typedef PIMAGE_NT_HEADERS _PIMAGE_NT_HEADERS;
 #endif
 
-__forceinline _PDWORD GetInLoadOrderModuleList();
-__forceinline _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash);
-__forceinline _DWORD GetNtdllAddr();
-__forceinline DWORD GetFuncHash(char* functionName);
-__forceinline _DWORD GetKernel32Addr();
-__forceinline _DWORD GetExeBaseAddr();
-__forceinline _DWORD GetNtdllAddr();
+#pragma warning(disable : 28251)
+#pragma warning(disable : 6001)
+#define INLINE __forceinline
 
+extern "C" {
+#pragma function(memset)
+	void* __cdecl memset(void* dest, int value, size_t num) {
+		__stosb(static_cast<unsigned char*>(dest), static_cast<unsigned char>(value), num);
+		return dest;
+	}
+#pragma function(memcpy)
+	void* __cdecl memcpy(void* dest, const void* src, size_t num) {
+		__movsb(static_cast<unsigned char*>(dest), static_cast<const unsigned char*>(src), num);
+		return dest;
+	}
+}
 
-__forceinline _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash);
-
-__forceinline _DWORD GetNtdllAddr();
-
-__forceinline DWORD GetFuncHash(char* functionName) {
+constexpr INLINE DWORD Hash(const char* functionName) {
 	DWORD hash = 0;
 	while (*functionName) {
 		hash = (hash * 138) + *functionName;
 		functionName++;
 	}
-
 	return hash;
 }
 
-__forceinline _PDWORD GetInLoadOrderModuleList() {
+INLINE _DWORD GetNtdllAddr() {
+	_DWORD dwNtdll = 0;
+	_TEB* pTeb = NtCurrentTeb();
+	_PDWORD pPeb = (_PDWORD) * (_PDWORD)((_DWORD)pTeb + _PEB_Offset);
+	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset);
+	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _IOM_Offset);
+	_PDWORD pModuleExe = (_PDWORD)*InLoadOrderModuleList;
+	_PDWORD pModuleNtdll = (_PDWORD)*pModuleExe;
+	dwNtdll = pModuleNtdll[6];
+	return dwNtdll;
+}
+
+INLINE _DWORD GetKernel32Addr() {
 	_DWORD dwKernel32 = 0;
 	_TEB* pTeb = NtCurrentTeb();
 	_PDWORD pPeb = (_PDWORD) * (_PDWORD)((_DWORD)pTeb + _PEB_Offset);
 	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset);
 	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _IOM_Offset);
-	return InLoadOrderModuleList;
-}
-
-__forceinline _DWORD GetKernel32Addr() {
-	_DWORD dwKernel32 = 0;
-	_PDWORD InLoadOrderModuleList = GetInLoadOrderModuleList();
 	_PDWORD pModuleExe = (_PDWORD)*InLoadOrderModuleList;
 	_PDWORD pModuleNtdll = (_PDWORD)*pModuleExe;
 	_PDWORD pModuleKernel32 = (_PDWORD)*pModuleNtdll;
@@ -60,24 +65,18 @@ __forceinline _DWORD GetKernel32Addr() {
 	return dwKernel32;
 }
 
-__forceinline _DWORD GetExeBaseAddr() {
+INLINE _DWORD GetExeBaseAddr() {
 	_DWORD dwExe = 0;
-	_PDWORD InLoadOrderModuleList = GetInLoadOrderModuleList();
+	_TEB* pTeb = NtCurrentTeb();
+	_PDWORD pPeb = (_PDWORD) * (_PDWORD)((_DWORD)pTeb + _PEB_Offset);
+	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset);
+	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _IOM_Offset);
 	_PDWORD pModuleExe = (_PDWORD)*InLoadOrderModuleList;
 	dwExe = pModuleExe[6];
 	return dwExe;
 }
 
-__forceinline _DWORD GetNtdllAddr() {
-	_DWORD dwNtll = 0;
-	_PDWORD InLoadOrderModuleList = GetInLoadOrderModuleList();
-	_PDWORD pModuleExe = (_PDWORD)*InLoadOrderModuleList;
-	_PDWORD pModuleNtdll = (_PDWORD)*pModuleExe;
-	dwNtll = pModuleNtdll[6];
-	return dwNtll;
-}
-
-__forceinline _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash) {
+INLINE _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash) {
 	PIMAGE_DOS_HEADER pDos = (PIMAGE_DOS_HEADER)dwBase;
 	_PIMAGE_NT_HEADERS pNt = (_PIMAGE_NT_HEADERS)(dwBase + pDos->e_lfanew);
 	PIMAGE_EXPORT_DIRECTORY pExport = (PIMAGE_EXPORT_DIRECTORY)(dwBase + pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
@@ -86,14 +85,8 @@ __forceinline _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash) {
 	PWORD pEIT = (PWORD)(dwBase + pExport->AddressOfNameOrdinals);
 	for (DWORD i = 0; i < pExport->NumberOfNames; i++) {
 		char* szFuncName = (char*)(dwBase + pENT[i]);
-		if (GetFuncHash(szFuncName) == hash) {
-			_DWORD funcAddr = dwBase + pEAT[pEIT[i]];
-			if (*((char*)funcAddr + 5) == 0x2E) {
-				return GetFuncAddrByHash(GetNtdllAddr(), GetFuncHash((char*)funcAddr + 6));
-			}
-			else {
-				return funcAddr;
-			}
+		if (Hash(szFuncName) == hash) {
+			return dwBase + pEAT[pEIT[i]];
 		}
 	}
 	return 0;
