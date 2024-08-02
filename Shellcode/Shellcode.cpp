@@ -8,7 +8,7 @@
 
 #include<stdio.h>
 
-// 定义程序入口
+// 瀹氫箟绋嬪簭鍏ュ彛
 #pragma comment(linker,"/entry:shellcode")
 
 #pragma code_seg("shell")
