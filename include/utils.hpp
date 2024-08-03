@@ -1,3 +1,5 @@
+#include<intrin.h>
+
 #if defined(_WIN64)
 #define _PEB_Offset 0x60
 #define _Ldr_Offset 0x18
