@@ -1,16 +1,22 @@
 #include<intrin.h>
 
 #if defined(_WIN64)
-#define _PEB_Offset 0x60
-#define _Ldr_Offset 0x18
-#define _IOM_Offset 0x10
+#define _PEB_Offset_1 0x30
+#define _PEB_Offset_2 0x30
+#define _Ldr_Offset_1 0x08
+#define _Ldr_Offset_2 0x10
+#define _List_Offset_1 0x08
+#define _List_Offset_2 0x08
 typedef DWORD64 _DWORD;
 typedef PDWORD64 _PDWORD;
 typedef PIMAGE_NT_HEADERS64 _PIMAGE_NT_HEADERS;
 #else
-#define _PEB_Offset 0x30
-#define _Ldr_Offset 0x0C
-#define _IOM_Offset 0x0C
+#define _PEB_Offset_1 0x18
+#define _PEB_Offset_2 0x18
+#define _Ldr_Offset_1 0x06
+#define _Ldr_Offset_2 0x06
+#define _List_Offset_1 0x06
+#define _List_Offset_2 0x06
 typedef DWORD _DWORD;
 typedef PDWORD _PDWORD;
 typedef PIMAGE_NT_HEADERS _PIMAGE_NT_HEADERS;
@@ -45,9 +51,15 @@ constexpr INLINE DWORD Hash(const char* functionName) {
 INLINE _DWORD GetNtdllAddr() {
 	_DWORD dwNtdll = 0;
 	_TEB* pTeb = NtCurrentTeb();
-	_PDWORD pPeb = (_PDWORD) * (_PDWORD)((_DWORD)pTeb + _PEB_Offset);
-	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset);
-	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _IOM_Offset);
+	volatile _DWORD _peb_offset_1 = _PEB_Offset_1;
+	volatile _DWORD _peb_offset_2 = _PEB_Offset_2;
+	_DWORD pPeb = __readgsqword(_peb_offset_1 + _peb_offset_2);
+	volatile _DWORD _ldr_offset_1 = _Ldr_Offset_1;
+	volatile _DWORD _ldr_offset_2 = _Ldr_Offset_2;
+	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset_1 + _Ldr_Offset_2);
+	volatile _DWORD _list_offset_1 = _List_Offset_1;
+	volatile _DWORD _list_offset_2 = _List_Offset_2;
+	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _list_offset_1 + _list_offset_2);
 	_PDWORD pModuleExe = (_PDWORD)*InLoadOrderModuleList;
 	_PDWORD pModuleNtdll = (_PDWORD)*pModuleExe;
 	dwNtdll = pModuleNtdll[6];
@@ -57,9 +69,15 @@ INLINE _DWORD GetNtdllAddr() {
 INLINE _DWORD GetKernel32Addr() {
 	_DWORD dwKernel32 = 0;
 	_TEB* pTeb = NtCurrentTeb();
-	_PDWORD pPeb = (_PDWORD) * (_PDWORD)((_DWORD)pTeb + _PEB_Offset);
-	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset);
-	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _IOM_Offset);
+	volatile _DWORD _peb_offset_1 = _PEB_Offset_1;
+	volatile _DWORD _peb_offset_2 = _PEB_Offset_2;
+	_DWORD pPeb = __readgsqword(_peb_offset_1 + _peb_offset_2);
+	volatile _DWORD _ldr_offset_1 = _Ldr_Offset_1;
+	volatile _DWORD _ldr_offset_2 = _Ldr_Offset_2;
+	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset_1 + _Ldr_Offset_2);
+	volatile _DWORD _list_offset_1 = _List_Offset_1;
+	volatile _DWORD _list_offset_2 = _List_Offset_2;
+	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _list_offset_1 + _list_offset_2);
 	_PDWORD pModuleExe = (_PDWORD)*InLoadOrderModuleList;
 	_PDWORD pModuleNtdll = (_PDWORD)*pModuleExe;
 	_PDWORD pModuleKernel32 = (_PDWORD)*pModuleNtdll;
@@ -70,9 +88,15 @@ INLINE _DWORD GetKernel32Addr() {
 INLINE _DWORD GetExeBaseAddr() {
 	_DWORD dwExe = 0;
 	_TEB* pTeb = NtCurrentTeb();
-	_PDWORD pPeb = (_PDWORD) * (_PDWORD)((_DWORD)pTeb + _PEB_Offset);
-	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset);
-	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _IOM_Offset);
+	volatile _DWORD _peb_offset_1 = _PEB_Offset_1;
+	volatile _DWORD _peb_offset_2 = _PEB_Offset_2;
+	_DWORD pPeb = __readgsqword(_peb_offset_1 + _peb_offset_2);
+	volatile _DWORD _ldr_offset_1 = _Ldr_Offset_1;
+	volatile _DWORD _ldr_offset_2 = _Ldr_Offset_2;
+	_PDWORD pLdr = (_PDWORD) * (_PDWORD)((_DWORD)pPeb + _Ldr_Offset_1 + _Ldr_Offset_2);
+	volatile _DWORD _list_offset_1 = _List_Offset_1;
+	volatile _DWORD _list_offset_2 = _List_Offset_2;
+	_PDWORD InLoadOrderModuleList = (_PDWORD)((_DWORD)pLdr + _list_offset_1 + _list_offset_2);
 	_PDWORD pModuleExe = (_PDWORD)*InLoadOrderModuleList;
 	dwExe = pModuleExe[6];
 	return dwExe;
