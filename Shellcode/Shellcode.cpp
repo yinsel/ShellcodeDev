@@ -1,9 +1,6 @@
 #include<windows.h>
 #include<wininet.h>
-
-#include "utils.hpp"
 #include "api.hpp"
-
 #define EXPORT extern "C" __declspec(dllexport)
 
 #include<stdio.h>

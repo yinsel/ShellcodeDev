@@ -1,9 +1,19 @@
 #pragma once
+#include "header.h"
 
 typedef HMODULE(WINAPI* LoadLibraryAFunc)(_In_ LPCSTR lpLibFileName);
 typedef UINT(WINAPI* WinExecFunc)(_In_ LPCSTR lpCmdLine, _In_ UINT uCmdShow);
 typedef int (WINAPI* MessageBoxAFunc)(_In_opt_ HWND hWnd, _In_opt_ LPCSTR lpText, _In_opt_ LPCSTR lpCaption, _In_ UINT uType);
 
+
+constexpr INLINE DWORD Hash(const char* functionName) {
+	DWORD hash = 0;
+	while (*functionName) {
+		hash = (hash * 138) + *functionName;
+		functionName++;
+	}
+	return hash;
+}
 
 constexpr auto LoadLibraryAHash = Hash("LoadLibraryA");
 constexpr auto WinExecHash = Hash("WinExec");
@@ -21,6 +31,8 @@ typedef struct _FUNCTION {
 	DWORD* funcHashs;
 	DWORD count;
 }Function;
+
+INLINE _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash);
 
 INLINE void InitWindowsAPI(PFunctions API) {
 	_DWORD dwNtdll = GetNtdllAddr();
@@ -56,4 +68,20 @@ INLINE void InitWindowsAPI(PFunctions API) {
 			offset++;
 		}
 	}
+}
+
+INLINE _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash) {
+	PIMAGE_DOS_HEADER pDos = (PIMAGE_DOS_HEADER)dwBase;
+	_PIMAGE_NT_HEADERS pNt = (_PIMAGE_NT_HEADERS)(dwBase + pDos->e_lfanew);
+	PIMAGE_EXPORT_DIRECTORY pExport = (PIMAGE_EXPORT_DIRECTORY)(dwBase + pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+	PDWORD pEAT = (PDWORD)(dwBase + pExport->AddressOfFunctions);
+	PDWORD pENT = (PDWORD)(dwBase + pExport->AddressOfNames);
+	PWORD pEIT = (PWORD)(dwBase + pExport->AddressOfNameOrdinals);
+	for (DWORD i = 0; i < pExport->NumberOfNames; i++) {
+		char* szFuncName = (char*)(dwBase + pENT[i]);
+		if (Hash(szFuncName) == hash) {
+			return dwBase + pEAT[pEIT[i]];
+		}
+	}
+	return 0;
 }
