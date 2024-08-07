@@ -5,20 +5,20 @@
 assume fs: nothing
 GetPEB32 proc
     xor eax, eax
-    mov eax, fs:[30h]
-    mov eax, [eax+0Ch]
+    mov eax, 17h
+    mov eax, fs:[eax+19h]
     ret
 GetPEB32 endp
 
-GetExeBase32 proc
+GetExeBaseAddr32 proc
     call GetPEB32
-    mov eax, [eax+0Ch]
-    mov eax, [eax+18h]
+    mov eax, [eax+8h]
     ret
-GetExeBase32 endp
+GetExeBaseAddr32 endp
 
 GetNtdllAddr32 proc
     call GetPEB32
+    mov eax, [eax+0Ch]
     mov eax, [eax+0Ch]
     mov eax, [eax]
     mov eax, [eax+18h]
@@ -27,6 +27,7 @@ GetNtdllAddr32 endp
 
 GetKernel32Addr32 proc
     call GetPEB32
+    mov eax, [eax+0Ch]
     mov eax, [eax+0Ch]
     mov eax, [eax]
     mov eax, [eax]

@@ -34,13 +34,13 @@ typedef PIMAGE_NT_HEADERS _PIMAGE_NT_HEADERS;
 #define INLINE __forceinline
 
 extern "C" INLINE _DWORD GetPEB32();
-extern "C" INLINE  _DWORD GetExeBase64();
+extern "C" INLINE  _DWORD GetExeBaseAddr32();
 extern "C" INLINE _DWORD GetNtdllAddr32();
 extern "C" INLINE  _DWORD GetKernel32Addr32();
 
 extern "C" INLINE _DWORD GetPEB64();
+extern "C" INLINE _DWORD GetExeBaseAddr64();
 extern "C" INLINE _DWORD GetNtdllAddr64();
-extern "C" INLINE _DWORD GetExeBase64();
 extern "C" INLINE _DWORD GetKernel32Addr64();
 
 extern "C" {
