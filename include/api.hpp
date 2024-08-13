@@ -19,7 +19,7 @@ typedef HANDLE(WINAPI* GetStdHandleFunc)(_In_ DWORD nStdHandle);
 typedef BOOL(WINAPI* WriteConsoleAFunc)(_In_ HANDLE hConsoleOutput, _In_reads_(nNumberOfCharsToWrite) CONST VOID* lpBuffer, _In_ DWORD nNumberOfCharsToWrite, _Out_opt_ LPDWORD lpNumberOfCharsWritten, _Reserved_ LPVOID lpReserved);
 typedef VOID(WINAPI* SleepFunc)(_In_ DWORD dwMilliseconds);
 typedef HWND(APIENTRY* GetConsoleWindowFunc)(VOID);
-
+typedef FARPROC(WINAPI* GetProcAddressFunc)(_In_ HMODULE hModule, _In_ LPCSTR lpProcName);
 
 constexpr INLINE DWORD Hash(const char* functionName) {
 	DWORD hash = 0;
@@ -46,6 +46,7 @@ constexpr auto WriteConsoleAHash = Hash("WriteConsoleA");
 constexpr auto SleepHash = Hash("Sleep");
 constexpr auto GetConsoleWindowHash = Hash("GetConsoleWindow");
 constexpr auto RtlExitUserProcessHash = Hash("RtlExitUserProcess");
+constexpr auto GetProcAddressHash = Hash("GetProcAddress");
 
 
 typedef struct _FUNCTIONS {

@@ -209,10 +209,10 @@ INLINE size_t GetSkipFileAPIBrokering(VOID)
 #endif
 }
 
+
 INLINE VOID UNLOCK()
 {
-    Functions API;
-    InitWindowsAPI(&API);
+    GetProcAddressFunc pGetProcAddress = (GetProcAddressFunc)GetFuncAddrByHash(GetKernel32Addr(), GetProcAddressHash);
 #ifdef _WIN64
     //LdrFastFailInLoaderCallout导出函数开始匹配的特征码
     volatile unsigned char lock_count_flag[] = { 0x66, 0x21, 0x88, 0xEE, 0x17, 0x00, 0x00 };
@@ -267,13 +267,13 @@ INLINE VOID UNLOCK()
 
     RTLLEAVECRITICALSECTION RtlLeaveCriticalSection = NULL;
     volatile char szRtlLeaveCriticalSection[] = { 'R', 't', 'l', 'L', 'e', 'a', 'v', 'e', 'C', 'r', 'i', 't', 'i', 'c', 'a', 'l', 'S', 'e', 'c', 't', 'i', 'o', 'n', '\0' };
-    RtlLeaveCriticalSection = (RTLLEAVECRITICALSECTION)API.pGetProcAddress((HMODULE)hModule, (char*)szRtlLeaveCriticalSection);
+    RtlLeaveCriticalSection = (RTLLEAVECRITICALSECTION)pGetProcAddress((HMODULE)hModule, (char*)szRtlLeaveCriticalSection);
 
     RtlLeaveCriticalSection((PRTL_CRITICAL_SECTION)Peb->LoaderLock);
 
     //上面代码是解决使用LoadLibrary动态加载DLL的死锁，下面代码是解决静态导入的DLL的死锁问题
     volatile char szLdrFastFailInLoaderCallout[] = { 'L', 'd', 'r', 'F', 'a', 's', 't', 'F', 'a', 'i', 'l', 'I', 'n', 'L', 'o', 'a', 'd', 'e', 'r', 'C', 'a', 'l', 'l', 'o', 'u', 't', '\0' };
-    size_t hookAddr = (size_t)API.pGetProcAddress((HMODULE)hModule, (char*)szLdrFastFailInLoaderCallout);
+    size_t hookAddr = (size_t)pGetProcAddress((HMODULE)hModule, (char*)szLdrFastFailInLoaderCallout);
     if (hookAddr > 0) {
         //win7 和 08以上系统可以通过LdrFastFailInLoaderCallout导出函数定位到标记位地址
 #ifdef _WIN64
@@ -299,7 +299,7 @@ INLINE VOID UNLOCK()
 
     //系统有LdrGetDllFullName导出函数的，需要额外解锁EventMetadata，通过LdrGetDllFullName导出函数定位到标记位地址
     volatile char szLdrGetDllFullName[] = { 'L', 'd', 'r', 'G', 'e', 't', 'D', 'l', 'l', 'F', 'u', 'l', 'l', 'N', 'a', 'm', 'e', '\0' };
-    hookAddr = (size_t)API.pGetProcAddress((HMODULE)hModule, (char*)szLdrGetDllFullName);
+    hookAddr = (size_t)pGetProcAddress((HMODULE)hModule, (char*)szLdrGetDllFullName);
     if (hookAddr > 0) {
 #ifdef _WIN64
         addr = memFind((BYTE*)hookAddr, (unsigned char*)win10_staic_lock_flag1, (size_t)hookAddr + 0x80, sizeof(win10_staic_lock_flag1));
