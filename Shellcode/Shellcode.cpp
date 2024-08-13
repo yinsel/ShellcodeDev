@@ -10,7 +10,7 @@
 //#pragma comment(linker,"/entry:shellcode")
 
 #pragma code_seg("shell")
-EXPORT void shellcode() {
+void shellcode() {
 	Functions API;
 	InitWindowsAPI(&API);
 	char msg[] = { 's', 'h', 'e', 'l', 'l', 'c', 'o', 'd', 'e', '\0' };
