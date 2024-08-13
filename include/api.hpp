@@ -4,7 +4,7 @@
 typedef HMODULE(WINAPI* LoadLibraryAFunc)(_In_ LPCSTR lpLibFileName);
 typedef UINT(WINAPI* WinExecFunc)(_In_ LPCSTR lpCmdLine, _In_ UINT uCmdShow);
 typedef int (WINAPI* MessageBoxAFunc)(_In_opt_ HWND hWnd, _In_opt_ LPCSTR lpText, _In_opt_ LPCSTR lpCaption, _In_ UINT uType);
-
+typedef FARPROC(WINAPI* GetProcAddressFunc)(_In_ HMODULE hModule, _In_ LPCSTR lpProcName);
 
 constexpr INLINE DWORD Hash(const char* functionName) {
 	DWORD hash = 0;
@@ -18,11 +18,14 @@ constexpr INLINE DWORD Hash(const char* functionName) {
 constexpr auto LoadLibraryAHash = Hash("LoadLibraryA");
 constexpr auto WinExecHash = Hash("WinExec");
 constexpr auto MessageBoxAHash = Hash("MessageBoxA");
+constexpr auto GetProcAddressHash = Hash("GetProcAddress");
 
 
 typedef struct _FUNCTIONS {
 	LoadLibraryAFunc pLoadLibraryA;
 	WinExecFunc pWinExec;
+	GetProcAddressFunc pGetProcAddress;
+
 	MessageBoxAFunc pMessageBoxA;
 }Functions, * PFunctions;
 
@@ -37,13 +40,12 @@ INLINE _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash);
 INLINE void InitWindowsAPI(PFunctions API) {
 	_DWORD dwNtdll = GetNtdllAddr();
 	_DWORD dwKernel32 = GetKernel32Addr();
-
 	API->pLoadLibraryA = (LoadLibraryAFunc)GetFuncAddrByHash(dwKernel32, LoadLibraryAHash);
 	volatile char szUser32[] = { 'U', 's', 'e', 'r', '3', '2', '.', 'd', 'l', 'l', '\0' };
 
 	_DWORD dwUser32 = (_DWORD)API->pLoadLibraryA((char*)szUser32);
 	DWORD ntdllFunHashes[] = { 0x00 };
-	DWORD kernel32FunHashes[] = { LoadLibraryAHash, WinExecHash};
+	DWORD kernel32FunHashes[] = { LoadLibraryAHash, WinExecHash,GetProcAddressHash};
 	DWORD user32FunHashes[] = { MessageBoxAHash };
 
 	Function functions[] = {

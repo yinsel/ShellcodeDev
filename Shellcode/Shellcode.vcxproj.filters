@@ -26,6 +26,9 @@
     <ClInclude Include="..\include\api.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="dllmain.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="x32.asm">
