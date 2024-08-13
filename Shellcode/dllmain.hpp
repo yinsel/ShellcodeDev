@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <stdio.h>
 
-// ----------------------------------------- ²Î¿¼ÏîÄ¿£ºhttps://github.com/Neo-Maoku/DllMainHijacking ----------------------------------------
+// ----------------------------------------- å‚è€ƒé¡¹ç›®ï¼šhttps://github.com/Neo-Maoku/DllMainHijacking ----------------------------------------
 
 typedef struct _LSA_UNICODE_STRING {
     USHORT Length;
@@ -130,7 +130,7 @@ INLINE size_t memFind(BYTE* mem, BYTE* search, size_t memSize, size_t length)
     BOOL tmp;
 
     if (memSize < size_t(mem)) {
-        //·´ÏòËÑË÷
+        //åå‘æœç´¢
         for (size_t i = 0; size_t(mem) - i >= memSize; i++)
         {
             tmp = TRUE;
@@ -214,9 +214,9 @@ INLINE VOID UNLOCK()
 {
     GetProcAddressFunc pGetProcAddress = (GetProcAddressFunc)GetFuncAddrByHash(GetKernel32Addr(), GetProcAddressHash);
 #ifdef _WIN64
-    //LdrFastFailInLoaderCalloutµ¼³öº¯Êı¿ªÊ¼Æ¥ÅäµÄÌØÕ÷Âë
+    //LdrFastFailInLoaderCalloutå¯¼å‡ºå‡½æ•°å¼€å§‹åŒ¹é…çš„ç‰¹å¾ç 
     volatile unsigned char lock_count_flag[] = { 0x66, 0x21, 0x88, 0xEE, 0x17, 0x00, 0x00 };
-    //Õë¶ÔÃ»ÓĞLdrFastFailInLoaderCalloutµ¼³öº¯ÊıµÄ£¬È«¾ÖÌØÕ÷Âë
+    //é’ˆå¯¹æ²¡æœ‰LdrFastFailInLoaderCalloutå¯¼å‡ºå‡½æ•°çš„ï¼Œå…¨å±€ç‰¹å¾ç 
     volatile unsigned char win7_lock_count_flag[] = { 0xF0, 0x44, 0x0F, 0xB1, 0x35, 0xFF, 0xFF, 0xFF, 0xFF, 0x41 };
 #else
     volatile unsigned char lock_count_flag[] = { 0x66, 0x21, 0x88, 0xCA, 0x0F, 0x00, 0x00, 0xE8 };
@@ -224,7 +224,7 @@ INLINE VOID UNLOCK()
 #endif
 
 #ifdef _WIN64
-    //LdrGetDllFullNameµ¼³öº¯Êı¿ªÊ¼Æ¥ÅäµÄÌØÕ÷Âë£¬ÓĞÁ½¸öÊÇÎªÁË¼æÈİ²»Í¬°æ±¾ÏµÍ³
+    //LdrGetDllFullNameå¯¼å‡ºå‡½æ•°å¼€å§‹åŒ¹é…çš„ç‰¹å¾ç ï¼Œæœ‰ä¸¤ä¸ªæ˜¯ä¸ºäº†å…¼å®¹ä¸åŒç‰ˆæœ¬ç³»ç»Ÿ
     volatile unsigned char win10_staic_lock_flag1[] = { 0x48, 0x8B, 0x05, 0xFF, 0xFF, 0xFF, 0x00 };
     volatile unsigned char win10_staic_lock_flag2[] = { 0x48, 0x8B, 0x1d, 0xFF, 0xFF, 0xFF, 0x00 };
 #else
@@ -232,7 +232,7 @@ INLINE VOID UNLOCK()
 #endif
 
 #ifdef _WIN32
-    //ÉÏÃæµÄĞŞ¸Ä¶Ôserver2012ÏÂ32Î»³ÌĞò»¹ÎŞ·¨Í»ÆÆ£¬ĞèÒª¶îÍâ½âËø
+    //ä¸Šé¢çš„ä¿®æ”¹å¯¹server2012ä¸‹32ä½ç¨‹åºè¿˜æ— æ³•çªç ´ï¼Œéœ€è¦é¢å¤–è§£é”
     volatile unsigned char server12_staic_lock_flag[] = { 0x64, 0x8B, 0x1D, 0x18, 0x00, 0x00, 0x00, 0x83, 0x65, 0xDC, 0x00, 0xBA };
 #endif
 
@@ -241,7 +241,7 @@ INLINE VOID UNLOCK()
     volatile char sztext[] = { '.', 't', 'e', 'x', 't', '\0' };
     BYTE* textData = readSectionData((BYTE*)base, &rdataLength, (char*)sztext);
 
-    //ÊÊÓÃÓÚwin7 server 08ÒÔÉÏµÄÏµÍ³£¬ĞèÒª¸ñÍâ½âËø
+    //é€‚ç”¨äºwin7 server 08ä»¥ä¸Šçš„ç³»ç»Ÿï¼Œéœ€è¦æ ¼å¤–è§£é”
     size_t addr = memFind(textData, (unsigned char*)lock_count_flag, (size_t)textData + rdataLength, sizeof(lock_count_flag));
     if (addr != 0)
     {
@@ -271,11 +271,11 @@ INLINE VOID UNLOCK()
 
     RtlLeaveCriticalSection((PRTL_CRITICAL_SECTION)Peb->LoaderLock);
 
-    //ÉÏÃæ´úÂëÊÇ½â¾öÊ¹ÓÃLoadLibrary¶¯Ì¬¼ÓÔØDLLµÄËÀËø£¬ÏÂÃæ´úÂëÊÇ½â¾ö¾²Ì¬µ¼ÈëµÄDLLµÄËÀËøÎÊÌâ
+    //ä¸Šé¢ä»£ç æ˜¯è§£å†³ä½¿ç”¨LoadLibraryåŠ¨æ€åŠ è½½DLLçš„æ­»é”ï¼Œä¸‹é¢ä»£ç æ˜¯è§£å†³é™æ€å¯¼å…¥çš„DLLçš„æ­»é”é—®é¢˜
     volatile char szLdrFastFailInLoaderCallout[] = { 'L', 'd', 'r', 'F', 'a', 's', 't', 'F', 'a', 'i', 'l', 'I', 'n', 'L', 'o', 'a', 'd', 'e', 'r', 'C', 'a', 'l', 'l', 'o', 'u', 't', '\0' };
     size_t hookAddr = (size_t)pGetProcAddress((HMODULE)hModule, (char*)szLdrFastFailInLoaderCallout);
     if (hookAddr > 0) {
-        //win7 ºÍ 08ÒÔÉÏÏµÍ³¿ÉÒÔÍ¨¹ıLdrFastFailInLoaderCalloutµ¼³öº¯Êı¶¨Î»µ½±ê¼ÇÎ»µØÖ·
+        //win7 å’Œ 08ä»¥ä¸Šç³»ç»Ÿå¯ä»¥é€šè¿‡LdrFastFailInLoaderCalloutå¯¼å‡ºå‡½æ•°å®šä½åˆ°æ ‡è®°ä½åœ°å€
 #ifdef _WIN64
         hookAddr = hookAddr + 0x18 + 5 + *(PDWORD)(hookAddr + 0x18);
 #else
@@ -284,7 +284,7 @@ INLINE VOID UNLOCK()
         * (PDWORD)hookAddr = 2;
     }
     else {
-        //win7 ºÍ 08ÒÔÏÂÏµÍ³Ã»ÓĞLdrFastFailInLoaderCalloutµ¼³öº¯Êı£¬ĞèÒªËÑË÷ÌØÕ÷Âë¶¨Î»µ½±ê¼ÇÎ»µØÖ·
+        //win7 å’Œ 08ä»¥ä¸‹ç³»ç»Ÿæ²¡æœ‰LdrFastFailInLoaderCalloutå¯¼å‡ºå‡½æ•°ï¼Œéœ€è¦æœç´¢ç‰¹å¾ç å®šä½åˆ°æ ‡è®°ä½åœ°å€
         addr = memFind(textData, (unsigned char*)win7_lock_count_flag, (size_t)textData + rdataLength, sizeof(win7_lock_count_flag));
         if (addr != 0)
         {
@@ -297,7 +297,7 @@ INLINE VOID UNLOCK()
         }
     }
 
-    //ÏµÍ³ÓĞLdrGetDllFullNameµ¼³öº¯ÊıµÄ£¬ĞèÒª¶îÍâ½âËøEventMetadata£¬Í¨¹ıLdrGetDllFullNameµ¼³öº¯Êı¶¨Î»µ½±ê¼ÇÎ»µØÖ·
+    //ç³»ç»Ÿæœ‰LdrGetDllFullNameå¯¼å‡ºå‡½æ•°çš„ï¼Œéœ€è¦é¢å¤–è§£é”EventMetadataï¼Œé€šè¿‡LdrGetDllFullNameå¯¼å‡ºå‡½æ•°å®šä½åˆ°æ ‡è®°ä½åœ°å€
     volatile char szLdrGetDllFullName[] = { 'L', 'd', 'r', 'G', 'e', 't', 'D', 'l', 'l', 'F', 'u', 'l', 'l', 'N', 'a', 'm', 'e', '\0' };
     hookAddr = (size_t)pGetProcAddress((HMODULE)hModule, (char*)szLdrGetDllFullName);
     if (hookAddr > 0) {
@@ -310,15 +310,15 @@ INLINE VOID UNLOCK()
             *(size_t*)(*(size_t*)(*(size_t*)hookAddr + 0x98) + 0x38) += 2;
         }
 #else
-        addr = memFind((BYTE*)hookAddr, win10_staic_lock_flag1, (size_t)hookAddr + 0x150, sizeof(win10_staic_lock_flag1));
+        addr = memFind((BYTE*)hookAddr, (unsigned char*)win10_staic_lock_flag1, (size_t)hookAddr + 0x150, sizeof(win10_staic_lock_flag1));
         if (addr != 0)
         {
             hookAddr = *(PDWORD)(addr + 0x2);
             *(size_t*)(*(size_t*)(*(size_t*)hookAddr + 0x50) + 0x20) += 2;
         }
 
-        //´¦Àíserver2012ÌØÊâÇé¿ö£¬½âËø´úÂë£ºmov ecx, offset dword_7710F74C inc eax£¬lock xadd [ecx], eax
-        addr = memFind((BYTE*)hookAddr, server12_staic_lock_flag, (size_t)textData + rdataLength, sizeof(server12_staic_lock_flag));
+        //å¤„ç†server2012ç‰¹æ®Šæƒ…å†µï¼Œè§£é”ä»£ç ï¼šmov ecx, offset dword_7710F74C inc eaxï¼Œlock xadd [ecx], eax
+        addr = memFind((BYTE*)hookAddr, (unsigned char*)server12_staic_lock_flag, (size_t)textData + rdataLength, sizeof(server12_staic_lock_flag));
         if (addr != 0)
         {
             hookAddr = *(PDWORD)(addr + sizeof(server12_staic_lock_flag));
