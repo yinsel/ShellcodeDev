@@ -7,7 +7,7 @@
 #include<stdio.h>
 
 // 定义程序入口
-//#pragma comment(linker,"/entry:shellcode")
+#pragma comment(linker,"/entry:shellcode")
 
 #pragma code_seg("shell")
 void shellcode() {
