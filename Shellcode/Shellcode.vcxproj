@@ -174,8 +174,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\api.hpp" />
+    <ClInclude Include="..\include\dllmain.hpp" />
     <ClInclude Include="..\include\header.h" />
-    <ClInclude Include="dllmain.hpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="x64.asm">
