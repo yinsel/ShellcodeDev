@@ -9,7 +9,7 @@
 // 定义程序入口
 #pragma comment(linker,"/entry:shellcode")
 
-#pragma code_seg("shell")
+#pragma code_seg(".text")
 void shellcode() {
 	Functions API;
 	InitWindowsAPI(&API);

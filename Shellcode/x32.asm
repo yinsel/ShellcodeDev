@@ -1,6 +1,6 @@
 .model flat, c
 
-.code shell
+.code
 
 assume fs: nothing
 GetPEB32 proc

@@ -123,7 +123,7 @@ typedef struct _PEB {
     ULONG                   SessionId;
 } PEB, * PPEB;
 
-INLINE size_t memFind(BYTE* mem, BYTE* search, size_t memSize, size_t length)
+size_t memFind(BYTE* mem, BYTE* search, size_t memSize, size_t length)
 {
     size_t end = length - 1;
     size_t begin = 0;
@@ -176,7 +176,7 @@ INLINE size_t memFind(BYTE* mem, BYTE* search, size_t memSize, size_t length)
     return 0;
 }
 
-INLINE BYTE* readSectionData(BYTE* buffer, PDWORD rdataLength, char* secName) {
+BYTE* readSectionData(BYTE* buffer, PDWORD rdataLength, char* secName) {
     PIMAGE_DOS_HEADER dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(buffer);
     if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
         return 0;
@@ -198,7 +198,7 @@ INLINE BYTE* readSectionData(BYTE* buffer, PDWORD rdataLength, char* secName) {
     return 0;
 }
 
-INLINE size_t GetSkipFileAPIBrokering(VOID)
+size_t GetSkipFileAPIBrokering(VOID)
 {
 #if defined(_WIN64)
     volatile _DWORD offset = 0x15;
@@ -210,7 +210,7 @@ INLINE size_t GetSkipFileAPIBrokering(VOID)
 }
 
 
-INLINE VOID UNLOCK()
+VOID UNLOCK()
 {
     GetProcAddressFunc pGetProcAddress = (GetProcAddressFunc)GetFuncAddrByHash(GetKernel32Addr(), GetProcAddressHash);
 #ifdef _WIN64

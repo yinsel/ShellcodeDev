@@ -1,4 +1,4 @@
-.code shell
+.code
 
 GetPEB64 proc
     xor rax, rax

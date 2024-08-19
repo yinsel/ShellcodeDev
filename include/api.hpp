@@ -25,7 +25,7 @@ typedef void* (__cdecl* mallocFunc)(_In_ _CRT_GUARDOVERFLOW size_t _Size);
 typedef void* (__cdecl* memcpyFunc)(_Out_writes_bytes_all_(_Size) void* _Dst, _In_reads_bytes_(_Size)       void const* _Src, _In_                          size_t      _Size);
 
 
-constexpr INLINE DWORD Hash(const char* functionName) {
+constexpr DWORD Hash(const char* functionName) {
 	DWORD hash = 0;
 	while (*functionName) {
 		hash = (hash * 138) + *functionName;
@@ -72,9 +72,9 @@ typedef struct _FUNCTION {
 	DWORD count;
 }Function;
 
-INLINE _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash);
+_DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash);
 
-INLINE void InitWindowsAPI(PFunctions API) {
+void InitWindowsAPI(PFunctions API) {
 	_DWORD dwNtdll = GetNtdllAddr();
 	_DWORD dwKernel32 = GetKernel32Addr();
 	API->pLoadLibraryA = (LoadLibraryAFunc)GetFuncAddrByHash(dwKernel32, LoadLibraryAHash);
@@ -115,7 +115,7 @@ INLINE void InitWindowsAPI(PFunctions API) {
 	}
 }
 
-INLINE _DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash) {
+_DWORD GetFuncAddrByHash(_DWORD dwBase, _DWORD hash) {
 	PIMAGE_DOS_HEADER pDos = (PIMAGE_DOS_HEADER)dwBase;
 	_PIMAGE_NT_HEADERS pNt = (_PIMAGE_NT_HEADERS)(dwBase + pDos->e_lfanew);
 	PIMAGE_EXPORT_DIRECTORY pExport = (PIMAGE_EXPORT_DIRECTORY)(dwBase + pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
