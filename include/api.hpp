@@ -20,6 +20,10 @@ typedef BOOL(WINAPI* WriteConsoleAFunc)(_In_ HANDLE hConsoleOutput, _In_reads_(n
 typedef VOID(WINAPI* SleepFunc)(_In_ DWORD dwMilliseconds);
 typedef HWND(APIENTRY* GetConsoleWindowFunc)(VOID);
 typedef FARPROC(WINAPI* GetProcAddressFunc)(_In_ HMODULE hModule, _In_ LPCSTR lpProcName);
+typedef _VCRTIMP void* (__cdecl* memmoveFunc)(_Out_writes_bytes_all_opt_(_Size) void* _Dst, _In_reads_bytes_opt_(_Size)       void const* _Src, _In_                              size_t      _Size);
+typedef void* (__cdecl* mallocFunc)(_In_ _CRT_GUARDOVERFLOW size_t _Size);
+typedef void* (__cdecl* memcpyFunc)(_Out_writes_bytes_all_(_Size) void* _Dst, _In_reads_bytes_(_Size)       void const* _Src, _In_                          size_t      _Size);
+
 
 constexpr INLINE DWORD Hash(const char* functionName) {
 	DWORD hash = 0;
@@ -47,14 +51,19 @@ constexpr auto SleepHash = Hash("Sleep");
 constexpr auto GetConsoleWindowHash = Hash("GetConsoleWindow");
 constexpr auto RtlExitUserProcessHash = Hash("RtlExitUserProcess");
 constexpr auto GetProcAddressHash = Hash("GetProcAddress");
-
+constexpr auto memmoveHash = Hash("memmove");
+constexpr auto memcpyHash = Hash("memcpy");
+constexpr auto mallocHash = Hash("malloc");
 
 typedef struct _FUNCTIONS {
 	LoadLibraryAFunc pLoadLibraryA;
 	WinExecFunc pWinExec;
-	GetProcAddressFunc pGetProcAddress;
 
 	MessageBoxAFunc pMessageBoxA;
+
+	memmoveFunc pmemmove;
+	memcpyFunc pmemcpy;
+	mallocFunc pmalloc;
 }Functions, * PFunctions;
 
 typedef struct _FUNCTION {
@@ -69,17 +78,23 @@ INLINE void InitWindowsAPI(PFunctions API) {
 	_DWORD dwNtdll = GetNtdllAddr();
 	_DWORD dwKernel32 = GetKernel32Addr();
 	API->pLoadLibraryA = (LoadLibraryAFunc)GetFuncAddrByHash(dwKernel32, LoadLibraryAHash);
+
 	volatile char szUser32[] = { 'U', 's', 'e', 'r', '3', '2', '.', 'd', 'l', 'l', '\0' };
+	volatile char szmsvcrt[] = { 'm', 's', 'v', 'c', 'r', 't', '.', 'd', 'l', 'l', '\0' };
 
 	_DWORD dwUser32 = (_DWORD)API->pLoadLibraryA((char*)szUser32);
+	_DWORD dwmsvcrt = (_DWORD)API->pLoadLibraryA((char*)szmsvcrt);
+
 	DWORD ntdllFunHashes[] = { 0x00 };
-	DWORD kernel32FunHashes[] = { LoadLibraryAHash, WinExecHash,GetProcAddressHash};
+	DWORD kernel32FunHashes[] = { LoadLibraryAHash, WinExecHash};
 	DWORD user32FunHashes[] = { MessageBoxAHash };
+	DWORD msvcrtFunHashes[] = { memmoveHash,memcpyHash,mallocHash };
 
 	Function functions[] = {
 		{ dwNtdll,ntdllFunHashes,sizeof(ntdllFunHashes) / sizeof(DWORD) },
 		{ dwKernel32,kernel32FunHashes,sizeof(kernel32FunHashes) / sizeof(DWORD)},
-		{ dwUser32,user32FunHashes,sizeof(user32FunHashes) / sizeof(DWORD) }
+		{ dwUser32,user32FunHashes,sizeof(user32FunHashes) / sizeof(DWORD) },
+		{ dwmsvcrt,msvcrtFunHashes,sizeof(msvcrtFunHashes) / sizeof(DWORD) }
 	};
 
 	void** api = (void**)API;

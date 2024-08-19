@@ -17,7 +17,6 @@ void shellcode() {
 	char calc[] = { 'c', 'a', 'l', 'c', '.', 'e', 'x', 'e', '\0' };
 	API.pMessageBoxA(0, msg, msg, 0);
 	API.pWinExec(calc, SW_SHOW);
-	
 }
 
 // DllMain 上线 shellcode
