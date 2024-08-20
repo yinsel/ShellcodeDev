@@ -1,11 +1,5 @@
 #include<intrin.h>
 #if defined(_WIN64)
-#define _PEB_Offset_1 0x30
-#define _PEB_Offset_2 0x30
-#define _Ldr_Offset_1 0x08
-#define _Ldr_Offset_2 0x10
-#define _List_Offset_1 0x08
-#define _List_Offset_2 0x08
 typedef DWORD64 _DWORD;
 typedef PDWORD64 _PDWORD;
 typedef PIMAGE_NT_HEADERS64 _PIMAGE_NT_HEADERS;
@@ -14,12 +8,6 @@ typedef PIMAGE_NT_HEADERS64 _PIMAGE_NT_HEADERS;
 #define GetNtdllAddr GetNtdllAddr64
 #define GetKernel32Addr GetKernel32Addr64
 #else
-#define _PEB_Offset_1 0x18
-#define _PEB_Offset_2 0x18
-#define _Ldr_Offset_1 0x06
-#define _Ldr_Offset_2 0x06
-#define _List_Offset_1 0x06
-#define _List_Offset_2 0x06
 typedef DWORD _DWORD;
 typedef PDWORD _PDWORD;
 typedef PIMAGE_NT_HEADERS _PIMAGE_NT_HEADERS;
