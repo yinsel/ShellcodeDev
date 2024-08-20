@@ -19,14 +19,13 @@ typedef PIMAGE_NT_HEADERS _PIMAGE_NT_HEADERS;
 
 #pragma warning(disable : 28251)
 #pragma warning(disable : 6001)
-#define INLINE __forceinline
 
-extern "C" INLINE _DWORD GetPEB32();
-extern "C" INLINE  _DWORD GetExeBaseAddr32();
-extern "C" INLINE _DWORD GetNtdllAddr32();
-extern "C" INLINE  _DWORD GetKernel32Addr32();
+extern "C" _DWORD GetPEB32();
+extern "C" _DWORD GetExeBaseAddr32();
+extern "C" _DWORD GetNtdllAddr32();
+extern "C" _DWORD GetKernel32Addr32();
 
-extern "C" INLINE _DWORD GetPEB64();
-extern "C" INLINE _DWORD GetExeBaseAddr64();
-extern "C" INLINE _DWORD GetNtdllAddr64();
-extern "C" INLINE _DWORD GetKernel32Addr64();
+extern "C" _DWORD GetPEB64();
+extern "C" _DWORD GetExeBaseAddr64();
+extern "C" _DWORD GetNtdllAddr64();
+extern "C" _DWORD GetKernel32Addr64();
